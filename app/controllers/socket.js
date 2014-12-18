@@ -3,19 +3,22 @@
 // server-side socket behaviour
 var ios = null; // io is already taken in express
 var util = require('bitcore').util;
-var logger = require('../../lib/logger').logger;
+var mdb = require('../../lib/MessageDb').default();
+var microtime = require('microtime');
+var enableMessageBroker;
 
-module.exports.init = function(io_ext) {
+module.exports.init = function(io_ext, config) {
+  enableMessageBroker = config ? config.enableMessageBroker : false;
   ios = io_ext;
   if (ios) {
     // when a new socket connects
     ios.sockets.on('connection', function(socket) {
-      logger.verbose('New connection from ' + socket.id);
       // when it subscribes, make it join the according room
       socket.on('subscribe', function(topic) {
-        logger.debug('subscribe to ' + topic);
-        socket.join(topic);
-        socket.emit('subscribed');
+        if (socket.rooms.length === 1) {
+          console.log('subscribe to ' + topic);
+          socket.join(topic);
+        }
       });
 
       // disconnect handler
