@@ -43,6 +43,10 @@ program.on('--help', function() {
 \tP2P Port: %s\t\t\tBITCOIND_P2P_PORT\n\
 \tBITCOIND_DATADIR: %s\n\
 \t%s\n\
+\t\tCurrency: %s\tINSIGHT_CURRENCY\n\
+\t\tApi prefix: %s\tINSIGHT_APIPREFIX\n\
+\t\tFront End prefix: %s\tINSIGHT_FRONTENDPREFIX\n\
+\t\tSocket.io path: %s\tINSIGHT_SOCKETIOPATH\n\
 \nChange setting by assigning the enviroment variables above. Example:\n\
  $ INSIGHT_NETWORK="testnet" BITCOIND_HOST="123.123.123.123" ./insight.js\
 \n\n',
@@ -53,7 +57,12 @@ program.on('--help', function() {
     config.bitcoind.host,
     config.bitcoind.port,
     config.bitcoind.p2pPort,
-    config.bitcoind.dataDir + (config.network === 'testnet' ? '*' : ''), (config.network === 'testnet' ? '* (/testnet3 is added automatically)' : '')
+	dataDir + (network === 'testnet' ? '*' : ''), 
+	(network === 'testnet' ? '* (/testnet3 is added automatically)' : ''),
+	currency,
+	apiPrefix,
+	frontendPrefix,
+	socketioPath
   );
 });
 
@@ -123,8 +132,9 @@ if (peerSync) peerSync.allowReorgs = true;
 
 
 // socket.io
-var ios = require('socket.io')(server, config);
-require('./app/controllers/socket.js').init(ios);
+var server = require('http').createServer(expressApp);
+var ios = require('socket.io')(server, {path:config.socketioPath});
+require('./app/controllers/socket.js').init(expressApp, ios);
 
 // plugins
 if (config.enableRatelimiter) {

@@ -1,17 +1,96 @@
 'use strict';
 
-var path = require('path');
-var fs = require('fs');
-var mkdirp = require('mkdirp');
+var network = process.env.INSIGHT_NETWORK || 'testnet';
+var currency = process.env.INSIGHT_CURRENCY || 'btc';
+var apiPrefix = process.env.INSIGHT_APIPREFIX || '/api';
+var frontendPrefix = process.env.INSIGHT_FRONTENDPREFIX || '/';
+var socketioPath = process.env.INSIGHT_SOCKETIOPATH || '/socket.io';
 
-var rootPath = path.normalize(__dirname + '/..'),
+var config_currency = {
+    btc:{
+      db:'.insight',
+      name:'bitoin',
+      nameCamel:'Bitcoin',
+      livenet: {
+        port:3001,
+        rpc_port:8332,
+        p2p_port:8333
+      },
+      testnet:{
+        port:3001,
+        rpc_port:18332,
+        p2p_port:18333
+      }
+    },
+    ltc:{
+      db:'.insight_litecoin',
+      name:'litecoin',
+      nameCamel:'Litecoin',
+      livenet: {
+        port:3003,
+        rpc_port:9332,
+        p2p_port:9333
+      },
+      testnet:{
+        port:3003,
+        rpc_port:19332,
+        p2p_port:19333
+      }
+    },
+    doge:{
+      db:'.insight_dogecoin',
+      name:'dogecoin',
+      nameCamel:'Dogecoin',
+      livenet: {
+        port:3005,
+        rpc_port:22555,
+        p2p_port:22556
+      },
+      testnet:{
+        port:3005,
+        rpc_port:44555,
+        p2p_port:44556
+      }
+    },
+	    drk:{
+        db:'.insight_darkcoin',
+        name:'darkcoin',
+        nameCamel:'Darkcoin',
+        livenet: {
+          port:3007,
+          rpc_port:9998,
+          p2p_port:9999
+        },
+        testnet:{
+          port:3007,
+          rpc_port:19998,
+          p2p_port:19999
+        }
+      },
+	    cann:{
+        db:'.insight_cannabiscoin',
+        name:'cannabiscoin',
+        nameCamel:'CannabisCoin',
+        livenet: {
+          port:3007,
+          rpc_port:39347,
+          p2p_port:39348
+        },
+        testnet:{
+          port:3007,
+          rpc_port:19998,
+          p2p_port:19999
+        }
+      }	  
+}
+
+var path = require('path'),
+  fs = require('fs'),
+  rootPath = path.normalize(__dirname + '/..'),
   env,
-  db,
-  port,
-  b_port,
-  p2p_port;
+  db;
 
-var packageStr = fs.readFileSync(rootPath + '/package.json');
+var packageStr = fs.readFileSync('package.json');
 var version = JSON.parse(packageStr).version;
 
 
@@ -19,23 +98,35 @@ function getUserHome() {
   return process.env[(process.platform == 'win32') ? 'USERPROFILE' : 'HOME'];
 }
 
-var home = process.env.INSIGHT_DB || (getUserHome() + '/.insight');
+var home = process.env.INSIGHT_DB || (getUserHome() + '/' + config_currency[currency].db);
 
-if (process.env.INSIGHT_NETWORK === 'livenet') {
+if (!fs.existsSync(home)) {
+    var err = fs.mkdirSync(home);
+    if (err) {
+      console.log(err);
+      console.log("## ERROR! Can't create insight directory! \n");
+      console.log('\tPlease create it manually: ', db);
+      process.exit(-1);
+    }
+  }
+
+if (network === 'livenet') {
   env = 'livenet';
   db = home;
-  port = '3000';
-  b_port = '8332';
-  p2p_port = '8333';
 } else {
   env = 'testnet';
   db = home + '/testnet';
-  port = '3001';
-  b_port = '18332';
-  p2p_port = '18333';
 }
-port = parseInt(process.env.INSIGHT_PORT) || port;
 
+if (!fs.existsSync(db)) {
+    var err = fs.mkdirSync(db);
+    if (err) {
+      console.log(err);
+      console.log("## ERROR! Can't create testnet insight directory! \n");
+      console.log('\tPlease create it manually: ', db);
+      process.exit(-1);
+    }
+  }
 
 switch (process.env.NODE_ENV) {
   case 'production':
@@ -49,18 +140,18 @@ switch (process.env.NODE_ENV) {
     break;
 }
 
-var network = process.env.INSIGHT_NETWORK || 'testnet';
 
 var dataDir = process.env.BITCOIND_DATADIR;
 var isWin = /^win/.test(process.platform);
 var isMac = /^darwin/.test(process.platform);
 var isLinux = /^linux/.test(process.platform);
 if (!dataDir) {
-  if (isWin) dataDir = '%APPDATA%\\Bitcoin\\';
-  if (isMac) dataDir = process.env.HOME + '/Library/Application Support/Bitcoin/';
-  if (isLinux) dataDir = process.env.HOME + '/.bitcoin/';
+  if (isWin) dataDir = '%APPDATA%\\' + config_currency[currency].nameCamel + '\\';
+  if (isMac) dataDir = process.env.HOME + '/Library/Application Support/' + config_currency[currency].nameCamel + '/';
+  if (isLinux) dataDir = process.env.HOME + '/.' + config_currency[currency].name + '/';
 }
 dataDir += network === 'testnet' ? 'testnet3' : '';
+
 
 var safeConfirmations = process.env.INSIGHT_SAFE_CONFIRMATIONS || 6;
 var ignoreCache = process.env.INSIGHT_IGNORE_CACHE || 0;
@@ -71,8 +162,8 @@ var bitcoindConf = {
   user: process.env.BITCOIND_USER || 'user',
   pass: process.env.BITCOIND_PASS || 'pass',
   host: process.env.BITCOIND_HOST || '127.0.0.1',
-  port: process.env.BITCOIND_PORT || b_port,
-  p2pPort: process.env.BITCOIND_P2P_PORT || p2p_port,
+  port: process.env.BITCOIND_PORT || config_currency[currency][network].rpc_port,
+  p2pPort: process.env.BITCOIND_P2P_PORT || config_currency[currency][network].p2p_port,
   p2pHost: process.env.BITCOIND_P2P_HOST || process.env.BITCOIND_HOST || '127.0.0.1',
   dataDir: dataDir,
   // DO NOT CHANGE THIS!
@@ -89,10 +180,6 @@ var enablePublicInfo = process.env.ENABLE_PUBLICINFO === 'true';
 var loggerLevel = process.env.LOGGER_LEVEL || 'info';
 var enableHTTPS = process.env.ENABLE_HTTPS === 'true';
 var enableCurrencyRates = process.env.ENABLE_CURRENCYRATES === 'true';
-
-if (!fs.existsSync(db)) {
-  mkdirp.sync(db);
-}
 
 module.exports = {
   enableMonitor: enableMonitor,
@@ -116,9 +203,11 @@ module.exports = {
   version: version,
   root: rootPath,
   publicPath: process.env.INSIGHT_PUBLIC_PATH || false,
-  appName: 'Insight ' + env,
-  apiPrefix: '/api',
-  port: port,
+  appName: 'Insight ' + config_currency[currency].nameCamel + " " + env,
+  apiPrefix: apiPrefix,
+  frontendPrefix: frontendPrefix,
+  socketioPath: socketioPath,
+  port: config_currency[currency][network].port,
   leveldb: db,
   bitcoind: bitcoindConf,
   network: network,
@@ -133,4 +222,5 @@ module.exports = {
   },
   safeConfirmations: safeConfirmations, // PLEASE NOTE THAT *FULL RESYNC* IS NEEDED TO CHANGE safeConfirmations
   ignoreCache: ignoreCache,
+  currency: currency
 };
