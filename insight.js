@@ -134,7 +134,7 @@ if (peerSync) peerSync.allowReorgs = true;
 // socket.io
 var server = require('http').createServer(expressApp);
 var ios = require('socket.io')(server, {path:config.socketioPath});
-require('./app/controllers/socket.js').init(expressApp, ios);
+require('./app/controllers/socket.js').init(ios, config);
 
 // plugins
 if (config.enableRatelimiter) {

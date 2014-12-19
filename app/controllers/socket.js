@@ -3,6 +3,7 @@
 // server-side socket behaviour
 var ios = null; // io is already taken in express
 var util = require('bitcore').util;
+var logger = require('../../lib/logger').logger;
 var mdb = require('../../lib/MessageDb').default();
 var microtime = require('microtime');
 var enableMessageBroker;

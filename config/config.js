@@ -81,7 +81,22 @@ var config_currency = {
           rpc_port:19998,
           p2p_port:19999
         }
-      }	  
+      },
+		dgb:{
+        db:'.insight_digibyte',
+        name:'digibyte',
+        nameCamel:'Digibyte',
+        livenet: {
+          port:3008,
+          rpc_port:14022,
+          p2p_port:12024
+        },
+        testnet:{
+          port:3008,
+          rpc_port:19998,
+          p2p_port:19999
+        }
+      }	  	  
 }
 
 var path = require('path'),
