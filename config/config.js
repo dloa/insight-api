@@ -52,7 +52,7 @@ var config_currency = {
         p2p_port:44556
       }
     },
-	    drk:{
+    drk:{
         db:'.insight_darkcoin',
         name:'darkcoin',
         nameCamel:'Darkcoin',
@@ -67,7 +67,7 @@ var config_currency = {
           p2p_port:19999
         }
       },
-	    cann:{
+      cann:{
         db:'.insight_cannabiscoin',
         name:'cannabiscoin',
         nameCamel:'CannabisCoin',
@@ -82,7 +82,7 @@ var config_currency = {
           p2p_port:19999
         }
       },
-		dgb:{
+      dgb:{
         db:'.insight_digibyte',
         name:'digibyte',
         nameCamel:'Digibyte',
@@ -96,7 +96,22 @@ var config_currency = {
           rpc_port:19998,
           p2p_port:19999
         }
-      }	  	  
+      }
+      meow:{
+        db:'.insight_kittehcoin',
+        name:'kittehcoin',
+        nameCamel:'Kittehcoin',
+        livenet: {
+          port:3009,
+          rpc_port:22565,
+          p2p_port:22566
+        },
+        testnet:{
+          port:3009,
+          rpc_port:44565,
+          p2p_port:44566
+        }
+      }	  
 }
 
 var path = require('path'),
