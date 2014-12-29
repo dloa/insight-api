@@ -96,7 +96,7 @@ var config_currency = {
           rpc_port:19998,
           p2p_port:19999
         }
-      }
+      },
       meow:{
         db:'.insight_kittehcoin',
         name:'kittehcoin',
