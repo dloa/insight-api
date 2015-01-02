@@ -86,6 +86,6 @@ module.exports = function(app) {
   //Home route
   var index = require('../app/controllers/index');
   app.get(apiPrefix + '/version', index.version);
-  //app.get('*', index.render);
-  app.get(frontendPrefix, index.render);
+  app.get('*', index.render);
+  //app.get(frontendPrefix, index.render);
 };

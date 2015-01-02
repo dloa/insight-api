@@ -3,7 +3,7 @@
 var network = process.env.INSIGHT_NETWORK || 'testnet';
 var currency = process.env.INSIGHT_CURRENCY || 'btc';
 var apiPrefix = process.env.INSIGHT_APIPREFIX || '/api';
-var frontendPrefix = process.env.INSIGHT_FRONTENDPREFIX || '/';
+//var frontendPrefix = process.env.INSIGHT_FRONTENDPREFIX || '/';
 var socketioPath = process.env.INSIGHT_SOCKETIOPATH || '/socket.io';
 
 var config_currency = {
@@ -109,6 +109,21 @@ var config_currency = {
         testnet:{
           port:3009,
           rpc_port:44565,
+          p2p_port:44566
+        }
+      },
+      gmc:{
+        db:'.insight_gamerscoin',
+        name:'gamerscoin',
+        nameCamel:'GamersCoin',
+        livenet: {
+          port:3010,
+          rpc_port:40001,
+          p2p_port:40002
+        },
+        testnet:{
+          port:3010,
+          rpc_port:50001,
           p2p_port:44566
         }
       }	  
@@ -235,7 +250,7 @@ module.exports = {
   publicPath: process.env.INSIGHT_PUBLIC_PATH || false,
   appName: 'Insight ' + config_currency[currency].nameCamel + " " + env,
   apiPrefix: apiPrefix,
-  frontendPrefix: frontendPrefix,
+  //frontendPrefix: frontendPrefix,
   socketioPath: socketioPath,
   port: config_currency[currency][network].port,
   leveldb: db,
