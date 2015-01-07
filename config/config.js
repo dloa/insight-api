@@ -126,7 +126,22 @@ var config_currency = {
           rpc_port:50001,
           p2p_port:44566
         }
-      }	  
+      },
+      xpy:{
+        db:'.insight_paycoin',
+        name:'paycoin',
+        nameCamel:'Paycoin',
+        livenet: {
+          port:3011,
+          rpc_port:8999,
+          p2p_port:8998
+        },
+        testnet:{
+          port:3010,
+          rpc_port:8999,
+          p2p_port:9000
+        }
+      }	 	  
 }
 
 var path = require('path'),
