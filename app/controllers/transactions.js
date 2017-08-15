@@ -14,7 +14,8 @@ var tDb = require('../../lib/TransactionDb').default();
 var bdb = require('../../lib/BlockDb').default();
 
 exports.send = function(req, res) {
-  Rpc.sendRawTransaction(req.body.rawtx, function(err, txid) {
+  // disable high fee sanity checks     \----/ = allowHighFees
+  Rpc.sendRawTransaction(req.body.rawtx, true, function(err, txid) {
     if (err) {
       var message;
       if(err.code == -25) {
